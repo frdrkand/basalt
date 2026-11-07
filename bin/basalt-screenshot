@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# Screenshots: grim captures (slurp picks a region), and satty opens the image
+# for annotation. Bound to SUPER+S, SUPER+SHIFT+S and Print in hypr/binds.lua.
+# In satty, Ctrl+S saves to ~/Pictures/Screenshots and Ctrl+C copies to the
+# clipboard; satty exits after either (--early-exit).
+#
+# Usage: basalt-screenshot {region|all|focused}
+#   region  - drag-select an area (slurp)
+#   all     - every monitor, stitched
+#   focused - the monitor the mouse/focus is currently on
+#
+# Needs grim, slurp, satty, jq, hyprctl and wl-copy on PATH; the Nix lib's
+# `scripts` bundles them.
+set -euo pipefail
+
+mode="${1:-region}"
+dir="$HOME/Pictures/Screenshots"
+mkdir -p "$dir"
+file="$dir/$(date +'%Y-%m-%d_%H-%M-%S').png"
+
+# Shared satty invocation; reads the capture from stdin.
+satty_edit() {
+  satty --filename - \
+    --output-filename "$file" \
+    --copy-command wl-copy \
+    --early-exit
+}
+
+case "$mode" in
+  region)
+    geom="$(slurp)" || exit 0   # empty/cancelled selection -> abort quietly
+    grim -g "$geom" - | satty_edit
+    ;;
+  all)
+    grim - | satty_edit
+    ;;
+  focused)
+    name="$(hyprctl monitors -j | jq -r '.[] | select(.focused == true) | .name')"
+    grim -o "$name" - | satty_edit
+    ;;
+  *)
+    echo "usage: $0 {region|all|focused}" >&2
+    exit 1
+    ;;
+esac

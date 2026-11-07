@@ -1,0 +1,32 @@
+<svg
+   width="1920"
+   height="1080"
+   viewBox="0 0 507.99999 285.75001"
+   class="nix-wp"
+   xmlns="http://www.w3.org/2000/svg">
+  <style>
+    /* The only two colors. `--wp-bg` / `--wp-logo` (set on an ancestor at
+       runtime, e.g. by the theme-creator preview) override the fallbacks;
+       without them the file renders in the rice palette — base00 background,
+       base03 logo.
+
+       The fallbacks must be literal hex, NOT a second custom property:
+       librsvg (the rasterizer behind `magick wallpaper.svg …`) honours a
+       var() fallback but cannot resolve a custom property declared on an
+       ancestor, so a nested var() fallback renders as black. */
+    .nix-wp .bg   { fill: var(--wp-bg, #141817); }
+    .nix-wp .logo { fill: var(--wp-bg, #141817); stroke: var(--wp-logo, #6e7371); }
+  </style>
+  <g transform="translate(0,-11.249992)">
+    <path
+       class="bg"
+       d="M 0,11.249988 H 508 V 296.99999 H 0 Z" />
+    <g transform="matrix(0.62566571,-0.16764662,0.16764662,0.62566571,240.04022,681.6267)">
+      <path
+         class="logo"
+         style="fill-rule:evenodd;stroke-width:31.15394934;paint-order:stroke fill markers"
+         d="m 1578.6953,-152.2207 -79.3437,21.22656 -50.3262,185.865234 -136.0859,-136.841797 -159.2696,44.28125 508.711,508.763673 42.5214,-160.35938 -138.5371,-139.09961 71.7735,-264.523433 z M 945.96289,16.371094 864.875,38.195312 843.58398,117.52148 979.38477,254.03711 792.83398,303.4707 751.54688,463.54492 1446.5039,277.36719 1328.8906,160.36523 1139.1582,210.79102 Z m 843.17971,41.277344 -186.2461,694.937502 160.1347,-43.35352 51.1954,-189.52734 264.9707,-70.10156 21.6445,-81.13672 -58.0547,-58.10157 -186.1269,49.34961 50.4668,-186.27539 z m -616.1524,311.564452 -160.1347,43.35352 -51.19534,189.52734 -264.97071,70.10352 -21.64453,81.13476 58.05469,58.10156 186.12695,-49.34961 -50.46679,186.2754 117.98437,115.79292 z m -58.9785,281.51563 -42.5215,160.35742 138.5371,139.09961 -71.7734,264.52345 59.4434,59.3125 79.3437,-21.2266 50.3262,-185.8652 136.0859,136.8418 159.2715,-44.2813 z m 909.502,6.2539 -694.9571,186.17774 117.6133,117.0039 189.7324,-50.42578 193.1973,194.41992 81.0859,-21.8262 21.2911,-79.3261 -135.8008,-136.51567 186.5527,-49.43359 z"
+         transform="matrix(0.32814213,0.08792542,-0.08792542,0.32814213,1.0651316,-1021.7332)" />
+    </g>
+  </g>
+</svg>

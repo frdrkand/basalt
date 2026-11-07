@@ -1,0 +1,87 @@
+# Basalt's notifications: dunst, styled as the design system's NotificationCard.
+#
+# The frosted glass is not dunst's doing: the blur behind it comes from the
+# `dunst-glass` layer rule in hypr/rules.lua, matching dunst's `notifications`
+# layer namespace.
+#
+# USING IT. dunst reads ~/.config/dunst/dunstrc, then every
+# ~/.config/dunst/dunstrc.d/*.conf after it, so link this file as the former
+# and put a host's own settings in the latter: a section named again merges,
+# and the later value wins. (`dunst -config FILE` turns that search off, so a
+# host that passes a file builds one that already holds both; the Nix lib's
+# `dunstrc` does.)
+#
+# THE PALETTE is written out literally: dunst's ini has no variables. These
+# are Basalt's colours (theme.json, which `nix flake check` holds this file
+# to). The Nix lib recolours a copy for a host with a palette of its own.
+#
+# Colours with alpha are #rrggbbaa, the opposite byte order from QML. dunst's
+# ini parser treats an unquoted '#' as the start of a comment, so every colour,
+# and every value with spaces, is quoted.
+
+[global]
+    monitor = 0
+    follow = mouse
+
+    # Geometry: 340px card, 8px stack gap, 12/14 padding, top right.
+    width = 340
+    height = 300
+    origin = top-right
+    offset = 12x12
+    gap_size = 8
+    padding = 12
+    horizontal_padding = 14
+    text_icon_padding = 12
+
+    # Frame and corners: border-subtle (base03 at 70%), radius-lg.
+    frame_width = 1
+    frame_color = "#6e7371b3"
+    corner_radius = 4
+    separator_color = frame
+
+    # Surface and text: bg-glass-strong (base01 at 97%), base07 text, base03
+    # highlight.
+    background = "#222725f7"
+    foreground = "#f2f4f3"
+    highlight = "#6e7371"
+
+    # Typography, in three tiers: the app muted (base04), the title emphasised
+    # and bold (base07), the body secondary (base05). The UI face at Medium, the
+    # design system's base weight; Nerd Font glyphs in a body fall back through
+    # fontconfig.
+    font = "Onest Medium 10"
+    markup = full
+    format = "<span foreground='#959998' size='small'>%a</span>\n<b foreground='#f2f4f3'>%s</b>\n<span foreground='#cdd0cf'>%b</span>"
+    alignment = left
+    vertical_alignment = center
+    word_wrap = yes
+    ellipsize = end
+
+    # Icons: Papirus-Dark, on the left, chip-sized to the design's 36px.
+    icon_position = left
+    icon_theme = "Papirus-Dark,Adwaita"
+    enable_recursive_icon_lookup = true
+    min_icon_size = 16
+    max_icon_size = 36
+
+    # Interaction.
+    mouse_left_click = close_current
+    mouse_middle_click = do_action, close_current
+    mouse_right_click = close_all
+
+# Low and normal both keep the neutral frame: ordinary notifications are
+# chrome, not a semantic state. Only critical breaks out into a hue (base08).
+[urgency_low]
+    timeout = 5
+    frame_color = "#6e7371b3"
+    default_icon = dialog-information
+
+[urgency_normal]
+    timeout = 8
+    frame_color = "#6e7371b3"
+    default_icon = dialog-information
+
+[urgency_critical]
+    timeout = 0
+    frame_color = "#ff615d"
+    default_icon = dialog-error

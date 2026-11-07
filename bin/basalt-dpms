@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# Turns the monitors off or on through Hyprland. Used by hypridle (Basalt's
+# hypridle.conf, and a host's listener).
+#
+# Usage: basalt-dpms {on|off|off-if-locked}
+#   on             light every monitor; harmless when they are already lit
+#   off            blank every monitor
+#   off-if-locked  blank them only while hyprlock is up, so an idle session
+#                  that is not locked stays lit
+#
+# The spelling is the whole reason this script exists, twice over:
+#
+# 1. Hyprland's config is Lua, so `hyprctl dispatch` parses its argument as
+#    Lua. The usual `hyprctl dispatch dpms off` is a syntax error against it
+#    and dispatches nothing.
+#
+# 2. The argument must be a table. Hyprland reads the state with
+#    tableToggleAction, which returns "toggle" for anything that is not a
+#    table, so `hl.dsp.dpms("off")` is a toggle, not "off". After a resume that
+#    would blank a lit screen rather than light it.
+#
+# hyprctl exits non-zero on a rejected dispatch but says why only on stdout,
+# and hypridle sends its commands' output nowhere. So a failure goes to the
+# journal (`journalctl -t basalt-dpms`), or stderr without one.
+set -euo pipefail
+
+case "${1:-}" in
+  on | off) state=$1 ;;
+  off-if-locked)
+    pidof hyprlock >/dev/null || exit 0
+    state=off
+    ;;
+  *)
+    echo "usage: basalt-dpms {on|off|off-if-locked}" >&2
+    exit 2
+    ;;
+esac
+
+if ! out=$(hyprctl dispatch "hl.dsp.dpms({ action = \"$state\" })" 2>&1); then
+  msg="hyprctl rejected dpms $state: $out"
+  if command -v systemd-cat >/dev/null; then
+    echo "$msg" | systemd-cat -t basalt-dpms -p err
+  else
+    echo "$msg" >&2
+  fi
+  exit 1
+fi
