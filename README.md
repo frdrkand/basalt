@@ -41,7 +41,7 @@ btop/ fastfetch/ qalculate/   the monitor, the banner, the calculator (and the l
 gtk/ qt/         the palette for GTK (adw-gtk3) and Qt (qt6ct); gtk/README.md says why
 fontconfig/      the default faces
 applications/    yazi-open.desktop, for folders opened from other programs
-bin/             basalt-screenshot, basalt-dpms, basalt-gsettings
+bin/             basalt-link, basalt-gsettings, basalt-screenshot, basalt-dpms
 theme.json       the palette, fonts, icons, cursor and GTK theme: the canonical copy
 nix/             the NixOS module, the builders and the checks
 examples/        a host's side of everything, minimal
@@ -76,17 +76,19 @@ directory.
 
 ### From plain files
 
-Clone Basalt (a git submodule pins a revision) and link it in:
+Clone Basalt (a git submodule pins a revision) and put it in place:
 
 ```sh
-ln -s ~/src/basalt/hypr          ~/.config/hypr/basalt
-ln -s ~/src/basalt/quickshell    ~/.config/quickshell/basalt
-ln -s ~/src/basalt/dunst/dunstrc ~/.config/dunst/dunstrc
-ln -s ~/src/basalt/bin/basalt-screenshot ~/src/basalt/bin/basalt-dpms ~/.local/bin/
+~/src/basalt/bin/basalt-link
 ```
 
-then copy the host's files from `examples/` and make them yours. Edits to
-Basalt's files are edits to the clone; the host's files are yours.
+It links every shared file and directory above into `~/.config` (and the
+scripts into `~/.local/bin`), so updating Basalt is updating the clone. It
+never touches the host's own files; something already at one of its paths is
+replaced if it is a symlink and otherwise moved aside to `<path>.pre-basalt`.
+`basalt-link --remove` takes it all out again. Then copy the host's files from
+`examples/`, make them yours, and run `basalt-gsettings` once from a desktop
+session.
 
 What has to be installed: Hyprland 0.55 or later (the Lua config), quickshell
 0.2 or later (`qs.` imports), hypridle, hyprlock, hyprpaper and dunst, kitty,

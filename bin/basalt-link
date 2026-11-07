@@ -1,0 +1,135 @@
+#!/usr/bin/env bash
+# Puts Basalt's shared files in place under $HOME, for a host that uses plain
+# files rather than the NixOS module: everything is a symlink into this Basalt
+# checkout, so editing Basalt (or moving it to another revision) is all an
+# update takes. The one exception is qt6ct.conf, which needs an absolute path
+# inside it and is written instead; run this again after moving Basalt.
+#
+# Usage: basalt-link [--remove]
+#   (none)    link everything; safe to run again
+#   --remove  remove the links into this checkout, and the written files
+#
+# The host's own files are never touched: hyprland.lua, hyprlock.conf,
+# hypridle.conf, hyprpaper.conf, shell.qml, Host.qml, ~/.zshrc, and the
+# drop-ins (kitty.d/, dunstrc.d/). Something already at a path Basalt links to
+# is replaced if it is a symlink, and otherwise moved aside to
+# <path>.pre-basalt, never deleted: btop and qalc, say, write a config of their
+# own the first time they run.
+set -euo pipefail
+
+basalt="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
+config="${XDG_CONFIG_HOME:-$HOME/.config}"
+data="${XDG_DATA_HOME:-$HOME/.local/share}"
+bin="$HOME/.local/bin"
+marker="# Written by basalt-link"
+
+# Link path -> file or directory in Basalt.
+links=(
+  "$config/hypr/basalt=hypr"
+  "$config/quickshell/basalt=quickshell"
+  "$config/zsh/basalt=zsh"
+  "$config/dunst/dunstrc=dunst/dunstrc"
+  "$config/kitty/kitty.conf=kitty/kitty.conf"
+  "$config/starship.toml=starship/starship.toml"
+  "$config/yazi=yazi"
+  "$config/btop/btop.conf=btop/btop.conf"
+  "$config/fastfetch/config.jsonc=fastfetch/config.jsonc"
+  "$config/qalculate/qalc.cfg=qalculate/qalc.cfg"
+  "$config/gtk-3.0/gtk.css=gtk/gtk-3.0/gtk.css"
+  "$config/gtk-3.0/colors.css=gtk/gtk-3.0/colors.css"
+  "$config/gtk-4.0/gtk.css=gtk/gtk-4.0/gtk.css"
+  "$config/gtk-4.0/colors.css=gtk/gtk-4.0/colors.css"
+  "$config/fontconfig/conf.d/50-basalt.conf=fontconfig/50-basalt.conf"
+  "$data/applications/yazi-open.desktop=applications/yazi-open.desktop"
+  "$bin/basalt-screenshot=bin/basalt-screenshot"
+  "$bin/basalt-dpms=bin/basalt-dpms"
+  "$bin/basalt-gsettings=bin/basalt-gsettings"
+)
+
+# Written path -> template; @COLORS@ becomes the absolute path of the palette.
+written=(
+  "$config/qt6ct/qt6ct.conf=qt/qt6ct.conf"
+  "$config/qt5ct/qt5ct.conf=qt/qt6ct.conf"
+)
+
+moved=()
+
+# Moves whatever is at $1 out of the way, unless it is a symlink (removed) or
+# nothing.
+clear_path() {
+  local dst=$1
+  if [ -L "$dst" ]; then
+    rm "$dst"
+  elif [ -e "$dst" ]; then
+    if [ -e "$dst.pre-basalt" ] || [ -L "$dst.pre-basalt" ]; then
+      echo "basalt-link: $dst is in the way, and so is $dst.pre-basalt; move one and run again" >&2
+      return 1
+    fi
+    mv "$dst" "$dst.pre-basalt"
+    moved+=("$dst")
+  fi
+}
+
+link() {
+  local dst=$1 src=$basalt/$2
+  [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ] && return 0
+  clear_path "$dst" || return 1
+  mkdir -p "$(dirname "$dst")"
+  ln -s "$src" "$dst"
+  echo "linked $dst"
+}
+
+write() {
+  local dst=$1 src=$basalt/$2 content
+  content=$(
+    printf '%s from %s; run it again if Basalt moves.\n' "$marker" "$src"
+    sed "s|@COLORS@|$basalt/qt/base16.conf|" "$src"
+  )
+  if [ -f "$dst" ] && [ ! -L "$dst" ] && head -n1 "$dst" | grep -qF "$marker"; then
+    [ "$(cat "$dst")" = "$content" ] && return 0
+  else
+    clear_path "$dst" || return 1
+  fi
+  mkdir -p "$(dirname "$dst")"
+  printf '%s\n' "$content" > "$dst"
+  echo "wrote  $dst"
+}
+
+remove() {
+  local entry dst
+  for entry in "${links[@]}"; do
+    dst=${entry%%=*}
+    if [ -L "$dst" ] && [[ $(readlink "$dst") == "$basalt"/* ]]; then
+      rm "$dst"
+      echo "removed $dst"
+    fi
+  done
+  for entry in "${written[@]}"; do
+    dst=${entry%%=*}
+    if [ -f "$dst" ] && head -n1 "$dst" | grep -qF "$marker"; then
+      rm "$dst"
+      echo "removed $dst"
+    fi
+  done
+}
+
+case "${1:-}" in
+  --remove)
+    remove
+    exit 0
+    ;;
+  "") ;;
+  *)
+    echo "usage: basalt-link [--remove]" >&2
+    exit 2
+    ;;
+esac
+
+fail=0
+for entry in "${links[@]}"; do link "${entry%%=*}" "${entry#*=}" || fail=1; done
+for entry in "${written[@]}"; do write "${entry%%=*}" "${entry#*=}" || fail=1; done
+
+for dst in "${moved[@]}"; do
+  echo "moved aside: $dst -> $dst.pre-basalt"
+done
+exit "$fail"

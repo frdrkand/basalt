@@ -169,6 +169,12 @@ in
     config = generatedShell;
   };
   inherit palette;
+  shellcheck =
+    pkgs.runCommand "basalt-bin-shellchecked" { nativeBuildInputs = [ pkgs.shellcheck ]; }
+      ''
+        shellcheck -S warning ${../bin}/*
+        touch $out
+      '';
   zsh = pkgs.runCommand "basalt-zsh-parses" { nativeBuildInputs = [ pkgs.zsh ]; } ''
     zsh -n ${../zsh/init.zsh}
     zsh -n ${../zsh/finish.zsh}
