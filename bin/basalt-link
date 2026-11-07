@@ -12,9 +12,9 @@
 # The host's own files are never touched: hyprland.lua, hyprlock.conf,
 # hypridle.conf, hyprpaper.conf, shell.qml, Host.qml, ~/.zshrc, and the
 # drop-ins (kitty.d/, dunstrc.d/). Something already at a path Basalt links to
-# is replaced if it is a symlink, and otherwise moved aside to
-# <path>.pre-basalt, never deleted: btop and qalc, say, write a config of their
-# own the first time they run.
+# is replaced if it is a symlink or an empty directory, and otherwise moved
+# aside to <path>.pre-basalt, never deleted: btop and qalc, say, write a config
+# of their own the first time they run.
 set -euo pipefail
 
 basalt="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
@@ -60,6 +60,8 @@ clear_path() {
   local dst=$1
   if [ -L "$dst" ]; then
     rm "$dst"
+  elif [ -d "$dst" ] && [ -z "$(ls -A "$dst")" ]; then
+    rmdir "$dst"
   elif [ -e "$dst" ]; then
     if [ -e "$dst.pre-basalt" ] || [ -L "$dst.pre-basalt" ]; then
       echo "basalt-link: $dst is in the way, and so is $dst.pre-basalt; move one and run again" >&2
