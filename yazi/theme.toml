@@ -1,0 +1,226 @@
+# yazi's colours, from the base16 palette (written out literally; Basalt's
+# theme.json is the canonical copy). The accent is the neutral base03, as
+# everywhere in Basalt.
+# See https://yazi-rs.github.io/docs/configuration/theme
+
+[app]
+
+[cmp.active]
+bold = true
+fg = "#ce74dc"
+
+[cmp.border]
+fg = "#6e7371"
+
+[cmp.inactive]
+fg = "#cdd0cf"
+
+[confirm.border]
+fg = "#6e7371"
+
+[confirm.btn_no]
+fg = "#cdd0cf"
+
+[confirm.btn_yes]
+bg = "#6e7371"
+bold = true
+fg = "#f2f4f3"
+
+[confirm.title]
+fg = "#f2f4f3"
+
+[filetype]
+
+[flavor]
+
+[help.desc]
+fg = "#cdd0cf"
+
+[help.footer]
+bg = "#cdd0cf"
+fg = "#222725"
+
+[help.hovered]
+bg = "#293b35"
+bold = true
+
+[help.on]
+fg = "#ce74dc"
+
+[help.run]
+fg = "#20b1bf"
+
+[icon]
+
+[indicator]
+
+[input.border]
+fg = "#6e7371"
+
+[input.selected]
+reversed = true
+
+[mgr]
+border_symbol = "│"
+tab_width = 1
+
+[mgr.border_style]
+fg = "#6e7371"
+
+[mgr.count_copied]
+bg = "#39ba5a"
+fg = "#141817"
+
+[mgr.count_cut]
+bg = "#ff615d"
+fg = "#141817"
+
+[mgr.count_selected]
+bg = "#6e7371"
+fg = "#f2f4f3"
+
+[mgr.cwd]
+fg = "#959998"
+
+[mgr.find_keyword]
+fg = "#bd9903"
+italic = true
+
+[mgr.find_position]
+bg = "reset"
+fg = "#ce74dc"
+italic = true
+
+[mgr.hovered]
+reversed = true
+
+[mgr.marker_copied]
+bg = "#39ba5a"
+fg = "#39ba5a"
+
+[mgr.marker_cut]
+bg = "#ff615d"
+fg = "#ff615d"
+
+[mgr.marker_marked]
+bg = "#20b1bf"
+fg = "#20b1bf"
+
+[mgr.marker_selected]
+bg = "#6e7371"
+fg = "#6e7371"
+
+[mgr.preview_hovered]
+underline = true
+
+[mgr.tab_active]
+bg = "#6e7371"
+fg = "#f2f4f3"
+
+[mgr.tab_inactive]
+bg = "#222725"
+fg = "#cdd0cf"
+
+[mode.normal_alt]
+bg = "#222725"
+fg = "#959998"
+
+[mode.normal_main]
+bg = "#6e7371"
+bold = true
+fg = "#f2f4f3"
+
+[mode.select_alt]
+bg = "#222725"
+fg = "#39ba5a"
+
+[mode.select_main]
+bg = "#39ba5a"
+bold = true
+fg = "#141817"
+
+[mode.unset_alt]
+bg = "#222725"
+fg = "#bd9903"
+
+[mode.unset_main]
+bg = "#bd9903"
+bold = true
+fg = "#141817"
+
+[notify]
+
+[pick.active]
+bold = true
+fg = "#ce74dc"
+
+[pick.border]
+fg = "#6e7371"
+
+[pick.inactive]
+fg = "#cdd0cf"
+
+[spot]
+
+[status]
+separator_close = ""
+separator_open = ""
+
+[status.perm_exec]
+fg = "#39ba5a"
+
+[status.perm_read]
+fg = "#bd9903"
+
+[status.perm_sep]
+fg = "#6e7371"
+
+[status.perm_type]
+fg = "#959998"
+
+[status.perm_write]
+fg = "#ff615d"
+
+[status.progress_error]
+bg = "#222725"
+fg = "#ff615d"
+
+[status.progress_label]
+bold = true
+fg = "#f2f4f3"
+
+[status.progress_normal]
+bg = "#222725"
+fg = "#959998"
+
+[status.separator_style]
+bg = "#222725"
+fg = "#222725"
+
+[tabs]
+
+[tasks.border]
+fg = "#6e7371"
+
+[tasks.hovered]
+fg = "#ce74dc"
+underline = true
+
+[which]
+cols = 3
+separator = "  "
+
+[which.cand]
+fg = "#20b1bf"
+
+[which.desc]
+fg = "#cdd0cf"
+
+[which.mask]
+bg = "#222725"
+
+[which.rest]
+fg = "#959998"
+
+[which.separator_style]
+fg = "#6e7371"

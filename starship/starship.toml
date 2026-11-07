@@ -1,0 +1,226 @@
+# Basalt's prompt: starship. Loaded by oh-my-zsh's `starship` plugin
+# (zsh/init.zsh).
+#
+# USING IT. starship reads one file, ~/.config/starship.toml or $STARSHIP_CONFIG,
+# with no includes: link this as the former. From Nix, the module wraps starship
+# with STARSHIP_CONFIG pointing at a (recoloured) copy; the wrapper's own path is
+# what `starship init` bakes into the prompt, so the variable sticks.
+#
+# A flat prompt: no segment backgrounds, so no powerline caps either (those
+# glyphs only read as arrows between two fills). The segments are told apart by
+# colour and separated by a thin divider (U+E0B1) in base04; every language and
+# tool module is wrapped in literal brackets instead.
+#
+# The `claude-code` profile is Claude Code's status line.
+#
+# THE PALETTE is written out literally (Basalt's theme.json, held to it by
+# `nix flake check`).
+
+add_newline = true
+format = "$directory$git_branch$git_status$time$all$character"
+
+[aws]
+format = "\\[[$symbol($profile)(\\($region\\))(\\[$duration\\])]($style)\\]"
+
+[bun]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[c]
+format = "\\[[$symbol($version(-$name))]($style)\\]"
+
+[claude_context]
+format = "[$gauge $percentage]($style) "
+gauge_width = 10
+
+[[claude_context.display]]
+style = "bold green"
+threshold = 0
+
+[[claude_context.display]]
+style = "bold yellow"
+threshold = 50
+
+[[claude_context.display]]
+style = "bold orange"
+threshold = 75
+
+[[claude_context.display]]
+style = "bold red"
+threshold = 90
+
+[claude_cost]
+format = "[$symbol +$lines_added / -$lines_removed ($duration)]($style) "
+
+[claude_model]
+format = "[$symbol$model]($style) "
+style = "bold blue"
+symbol = ""
+
+[cmake]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[cmd_duration]
+format = "\\[[$duration]($style)\\]"
+
+[cobol]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[conda]
+format = "\\[[$symbol$environment]($style)\\]"
+
+[crystal]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[daml]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[dart]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[deno]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[directory]
+format = "[ $path ]($style)[($read_only)]($read_only_style)[](fg:#959998)"
+read_only_style = "fg:#20b1bf"
+style = "fg:#20b1bf"
+truncate_to_repo = false
+truncation_length = 8
+truncation_symbol = "…/"
+use_os_path_sep = false
+
+[docker_context]
+format = "\\[[$symbol$context]($style)\\]"
+
+[dotnet]
+format = "\\[[$symbol($version)($tfm)]($style)\\]"
+
+[elixir]
+format = "\\[[$symbol($version \\(OTP $otp_version\\))]($style)\\]"
+
+[elm]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[erlang]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[gcloud]
+format = "\\[[$symbol$account(@$domain)(\\($region\\))]($style)\\]"
+
+[git_branch]
+format = "[ $symbol$branch ]($style)[](fg:#959998)"
+style = "fg:#39ba5a"
+
+[git_status]
+format = "([ $all_status$ahead_behind ]($style)[](#959998))"
+style = "fg:#ff615d"
+
+[golang]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[haskell]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[helm]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[hg_branch]
+format = "\\[[$symbol$branch]($style)\\]"
+
+[java]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[julia]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[kotlin]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[kubernetes]
+format = "\\[[$symbol$context( \\($namespace\\))]($style)\\]"
+
+[lua]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[memory_usage]
+format = "\\[$symbol[$ram( | $swap)]($style)\\]"
+
+[meson]
+format = "\\[[$symbol$project]($style)\\]"
+
+[nim]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[nix_shell]
+format = "\\[[$symbol$state( \\($name\\))]($style)\\]"
+
+[nodejs]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[ocaml]
+format = "\\[[$symbol($version)(\\($switch_indicator$switch_name\\))]($style)\\]"
+
+[openstack]
+format = "\\[[$symbol$cloud(\\($project\\))]($style)\\]"
+
+[package]
+format = "\\[[$symbol$version]($style)\\]"
+
+[perl]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[php]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[profiles]
+claude-code = "$claude_model        $claude_context        $claude_cost"
+
+[pulumi]
+format = "\\[[$symbol$stack]($style)\\]"
+
+[purescript]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[python]
+format = "\\[[${symbol}${pyenv_prefix}(${version})(\\($virtualenv\\))]($style)\\]"
+
+[raku]
+format = "\\[[$symbol($version-$vm_version)]($style)\\]"
+
+[red]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[ruby]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[rust]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[scala]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[spack]
+format = "\\[[$symbol$environment]($style)\\]"
+
+[sudo]
+format = "\\[[as $symbol]\\]"
+
+[swift]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[terraform]
+format = "\\[[$symbol$workspace]($style)\\]"
+
+[time]
+disabled = false
+format = "[ $time ]($style)"
+style = "fg:#ce74dc"
+
+[vagrant]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[vlang]
+format = "\\[[$symbol($version)]($style)\\]"
+
+[zig]
+format = "\\[[$symbol($version)]($style)\\]"

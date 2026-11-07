@@ -22,5 +22,12 @@
     "mono": "Hack Nerd Font Mono",
     "glyph": "Hack Nerd Font",
     "size": 11
+  },
+  "gtkTheme": "adw-gtk3-dark",
+  "colorScheme": "prefer-dark",
+  "icons": "Papirus-Dark",
+  "cursor": {
+    "name": "Bibata-Modern-Classic",
+    "size": 24
   }
 }

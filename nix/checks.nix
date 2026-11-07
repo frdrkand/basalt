@@ -1,6 +1,11 @@
 # `nix flake check`: Basalt against itself, through the same builders a host
 # uses, so what is checked here is what a host gets.
-{ pkgs, basalt }:
+{
+  pkgs,
+  nixpkgs,
+  basalt,
+  module,
+}:
 let
   inherit (pkgs) lib;
   inherit (basalt) theme;
@@ -74,16 +79,77 @@ let
         check ${../quickshell/HostConfig.qml} '${k}: "${v}"'
       '') theme.palette
     )}
-    # dunstrc spells colours with an alpha suffix sometimes; every colour in it
-    # must be one of the palette's.
-    for hex in $(grep -oE '#[0-9a-f]{6}' ${../dunst/dunstrc} | sort -u); do
-      case " ${lib.concatStringsSep " " (lib.attrValues theme.palette)} " in
-        *" ''${hex#\#} "*) ;;
-        *) echo "dunstrc: $hex is not in the palette"; fail=1 ;;
-      esac
+    # The files that spell the palette out literally: every colour in them
+    # must be one of the palette's, or the recolouring would miss it. The
+    # exceptions are not palette colours on purpose: black for Qt's shadow
+    # role, and GTK's three hand-darkened tints (gtk-4.0/colors.css says why).
+    allowed=" ${lib.concatStringsSep " " (lib.attrValues theme.palette)} 000000 123a1c 3a2f04 39393d "
+    for f in ${
+      lib.concatMapStringsSep " " toString [
+        ../dunst/dunstrc
+        ../kitty/kitty.conf
+        ../starship/starship.toml
+        ../yazi/theme.toml
+        ../yazi/init.lua
+        ../gtk/gtk-3.0/colors.css
+        ../gtk/gtk-4.0/colors.css
+        ../qt/base16.conf
+      ]
+    }; do
+      for hex in $(grep -oiE '#[0-9a-f]{6}' "$f" | tr A-F a-f | sort -u); do
+        case "$allowed" in
+          *" ''${hex#\#} "*) ;;
+          *) echo "$f: $hex is not in the palette"; fail=1 ;;
+        esac
+      done
     done
+    # The faces in fontconfig and the gsettings script.
+    for face in "${theme.fonts.ui}" "${theme.fonts.mono}"; do
+      check ${../fontconfig/50-basalt.conf} "<family>$face</family>"
+    done
+    check ${../bin/basalt-gsettings} "font-name '${theme.fonts.ui} ${toString theme.fonts.size}'"
+    check ${../bin/basalt-gsettings} "monospace-font-name '${theme.fonts.mono} ${toString theme.fonts.size}'"
+    check ${../bin/basalt-gsettings} "gtk-theme '${theme.gtkTheme}'"
+    check ${../bin/basalt-gsettings} "icon-theme '${theme.icons}'"
+    check ${../bin/basalt-gsettings} "cursor-theme '${theme.cursor.name}'"
+    check ${../bin/basalt-gsettings} "cursor-size ${toString theme.cursor.size}"
     [ $fail = 0 ] && touch $out
   '';
+
+  # The module, in a whole NixOS system, the way a host uses it: every piece
+  # on, declared monitors, the updates commands set.
+  system =
+    (nixpkgs.lib.nixosSystem {
+      modules = [
+        module
+        {
+          nixpkgs.hostPlatform = pkgs.stdenv.hostPlatform.system;
+          nixpkgs.config.allowUnfree = true;
+          boot.loader.grub.enable = false;
+          fileSystems."/" = {
+            device = "/dev/null";
+            fsType = "ext4";
+          };
+          system.stateVersion = "26.05";
+          basalt = {
+            enable = true;
+            display.outputs = [
+              {
+                name = "DP-1";
+                mode = "2560x1440@60";
+                position = "0x0";
+              }
+            ];
+            updates.status = [
+              "snout"
+              "has-updates"
+              "--json"
+            ];
+            idle.action = "blank-when-locked";
+          };
+        }
+      ];
+    }).config;
 in
 {
   hyprland-derived = basalt.verifyHyprland {
@@ -103,6 +169,20 @@ in
     config = generatedShell;
   };
   inherit palette;
+  zsh = pkgs.runCommand "basalt-zsh-parses" { nativeBuildInputs = [ pkgs.zsh ]; } ''
+    zsh -n ${../zsh/init.zsh}
+    zsh -n ${../zsh/finish.zsh}
+    touch $out
+  '';
+  module = system.system.build.toplevel;
+  module-hyprland = basalt.verifyHyprland {
+    inherit pkgs;
+    config = system.basalt.build.hyprland;
+  };
+  module-quickshell = basalt.lintQuickshell {
+    inherit pkgs;
+    config = system.basalt.build.quickshell;
+  };
   scripts = basalt.scripts { inherit pkgs; };
   wallpaper = basalt.wallpaper {
     inherit pkgs;

@@ -16,8 +16,8 @@
 # to). The Nix lib recolours a copy for a host with a palette of its own.
 #
 # Colours with alpha are #rrggbbaa, the opposite byte order from QML. dunst's
-# ini parser treats an unquoted '#' as the start of a comment, so every colour,
-# and every value with spaces, is quoted.
+# ini parser treats an unquoted '#' as the start of a comment, so every colour
+# is quoted.
 
 [global]
     monitor = 0
@@ -49,7 +49,7 @@
     # and bold (base07), the body secondary (base05). The UI face at Medium, the
     # design system's base weight; Nerd Font glyphs in a body fall back through
     # fontconfig.
-    font = "Onest Medium 10"
+    font = Onest Medium 10
     markup = full
     format = "<span foreground='#959998' size='small'>%a</span>\n<b foreground='#f2f4f3'>%s</b>\n<span foreground='#cdd0cf'>%b</span>"
     alignment = left

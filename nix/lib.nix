@@ -2,9 +2,9 @@
 # settings together in the store, and the checks that verify the result.
 #
 # Every builder takes `pkgs` (the host's, so nothing here pins a nixpkgs of its
-# own) and returns a derivation. None of them wraps or installs anything: how
-# the host hands these to Hyprland, quickshell, hyprlock and the rest is the
-# host's business.
+# own) and returns a derivation. Most of a NixOS host's needs are met by the
+# module (nix/module.nix), which uses these; a host that wraps and installs
+# things itself can use them directly:
 #
 #   basalt = inputs.basalt.lib;
 #   hyprlandDir   = basalt.hyprlandConfig   { inherit pkgs; settings = { ... }; };
@@ -51,6 +51,92 @@ rec {
     builtins.replaceStrings (
       map (k: theme.palette.${k}) baseNames ++ map (k: theme.fonts.${k}) fontKeys
     ) (map (k: palette.${k}) baseNames ++ map (k: fonts.${k}) fontKeys) text;
+
+  # One of Basalt's files, recoloured, in the store.
+  recolorFile =
+    {
+      pkgs,
+      src,
+      name ? baseNameOf src,
+      palette ? theme.palette,
+      fonts ? theme.fonts,
+    }:
+    pkgs.writeText name (recolor { inherit palette fonts; } (builtins.readFile src));
+
+  # One of Basalt's directories (yazi's, say), every file recoloured, laid out
+  # as it is in the repo.
+  recolorDir =
+    {
+      pkgs,
+      src,
+      name,
+      palette ? theme.palette,
+      fonts ? theme.fonts,
+    }:
+    pkgs.runCommand name { } (
+      lib.concatMapStrings (
+        file:
+        let
+          rel = lib.removePrefix (toString src + "/") (toString file);
+        in
+        ''
+          install -Dm644 ${
+            recolorFile {
+              inherit pkgs palette fonts;
+              src = file;
+            }
+          } "$out/${rel}"
+        ''
+      ) (lib.filesystem.listFilesRecursive src)
+    );
+
+  # `package` with some of its programs wrapped by makeWrapper: `bins` maps a
+  # program's name to the arguments makeWrapper gets after the two paths
+  # ("--add-flags" "--config /nix/store/…", "--set" "VAR" "value"). Everything
+  # else in the package is linked through unchanged, under the package's own
+  # name and version, with its meta (mainProgram included) and any `passthru`.
+  #
+  # makeWrapper execs with `-a "$0"`, so a program that bakes its own path into
+  # what it prints (starship's init) names the wrapper, and keeps its settings.
+  wrapPackage =
+    {
+      pkgs,
+      package,
+      bins,
+      postBuild ? "",
+      passthru ? { },
+    }:
+    (pkgs.symlinkJoin {
+      name = "${lib.getName package}-${lib.getVersion package}";
+      # The man pages too: the wrapper has one output, so they are linked into
+      # it rather than installed from the package's own `man`.
+      paths = [ package ] ++ lib.optional (package ? man) package.man;
+      nativeBuildInputs = [ pkgs.makeWrapper ];
+      postBuild =
+        lib.concatStrings (
+          lib.mapAttrsToList (bin: args: ''
+            rm -f "$out/bin/${bin}"
+            makeWrapper ${package}/bin/${bin} "$out/bin/${bin}" ${lib.escapeShellArgs args}
+          '') bins
+        )
+        + postBuild;
+    }).overrideAttrs
+      (_: {
+        passthru =
+          (package.passthru or { })
+          // {
+            # NixOS modules look at a package's override to see which build
+            # options it takes (programs.hyprland does). A wrapper takes none:
+            # override the package before handing it over instead.
+            override =
+              _: throw "basalt: ${lib.getName package} is wrapped; override the package that is wrapped instead";
+          }
+          // passthru;
+        meta = removeAttrs (package.meta or { }) [ "outputsToInstall" ];
+        # Version checks against the package (programs.hyprland has some).
+        pname = lib.getName package;
+        version = lib.getVersion package;
+      });
 
   # basalt-screenshot and basalt-dpms, with what they run on their PATH.
   scripts =

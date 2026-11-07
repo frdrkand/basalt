@@ -1,0 +1,41 @@
+# yazi's keys: only additions, prepended to yazi's own map.
+# See https://yazi-rs.github.io/docs/configuration/keymap
+
+[cmp]
+
+[confirm]
+
+[help]
+
+[input]
+
+[[mgr.prepend_keymap]]
+desc = "Move to trash (recoverable)"
+on = "d"
+run = "remove"
+
+[[mgr.prepend_keymap]]
+desc = "Delete permanently"
+on = "D"
+run = "remove --permanently"
+
+[[mgr.prepend_keymap]]
+desc = "Go to removable media"
+on = ["g", "m"]
+run = "plugin basalt-media"
+
+[[mgr.prepend_keymap]]
+desc = "Help (keybindings)"
+on = "<F1>"
+run = "help"
+
+[[mgr.prepend_keymap]]
+desc = "Help (keybindings)"
+on = "?"
+run = "help"
+
+[pick]
+
+[spot]
+
+[tasks]

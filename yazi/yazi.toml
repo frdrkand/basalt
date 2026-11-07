@@ -1,0 +1,46 @@
+# Basalt's file manager: yazi, in kitty. SUPER+E, and folders opened from other
+# programs (applications/yazi-open.desktop).
+#
+# USING IT. yazi reads this directory as ~/.config/yazi, or $YAZI_CONFIG_HOME:
+# link it as the former. From Nix, the module wraps yazi with YAZI_CONFIG_HOME
+# pointing at a (recoloured) copy. yazi has no includes; a host that wants a
+# different keymap or opener copies the file.
+#
+# Schema: Yazi 26.x ([mgr], not the old [manager]).
+# See https://yazi-rs.github.io/docs/configuration/yazi
+
+[confirm]
+
+[input]
+
+[mgr]
+linemode = "size"
+ratio = [1, 3, 4]
+scrolloff = 5
+show_hidden = true
+show_symlink = true
+sort_by = "natural"
+sort_dir_first = true
+sort_reverse = false
+sort_sensitive = false
+
+[open]
+
+[[opener.edit]]
+block = true
+desc = "Edit (nvim)"
+for = "unix"
+run = "nvim \"$@\""
+
+[pick]
+
+[plugin]
+
+[preview]
+image_delay = 30
+max_height = 900
+max_width = 900
+tab_size = 2
+wrap = "no"
+
+[which]

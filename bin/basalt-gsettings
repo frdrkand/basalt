@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Applies Basalt's look to org.gnome.desktop.interface: the GTK theme, dark
+# preference, icons, cursor and fonts. GTK reads these through the settings
+# portal (GTK4) or GDK's Wayland settings bridge (GTK3), which is how a GTK app
+# in any session gets them; GNOME's own session reads them too.
+#
+# For a host without the Nix module (which writes the same values as a dconf
+# profile instead). The values are Basalt's theme.json, which `nix flake
+# check` holds this file to. Run it from a desktop session: gsettings writes
+# through dconf on the session bus.
+set -euo pipefail
+
+if ! gsettings list-schemas >/dev/null 2>&1; then
+  echo "basalt-gsettings: no session bus or gsettings; run it from a desktop session" >&2
+  exit 1
+fi
+
+set_key() { gsettings set org.gnome.desktop.interface "$1" "$2"; }
+set_key gtk-theme 'adw-gtk3-dark'
+set_key color-scheme 'prefer-dark'
+set_key icon-theme 'Papirus-Dark'
+set_key cursor-theme 'Bibata-Modern-Classic'
+set_key cursor-size 24
+set_key font-name 'Onest 11'
+set_key document-font-name 'Onest 11'
+set_key monospace-font-name 'Hack Nerd Font Mono 11'

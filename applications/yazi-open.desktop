@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Yazi (open folder)
+Comment=Open a directory in Yazi inside kitty
+Exec=kitty -e yazi %f
+Terminal=false
+NoDisplay=true
+MimeType=inode/directory;
+Categories=System;FileManager;FileTools;ConsoleOnly;

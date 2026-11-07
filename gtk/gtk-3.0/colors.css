@@ -1,0 +1,65 @@
+/*
+* GTK Colors (GTK3)
+* Basalt's GTK palette: libadwaita's named colours from the base16 palette,
+* written out literally (theme.json is the canonical copy). Needs the
+* adw-gtk3-dark theme for GTK3; libadwaita (GTK4) reads it directly. See
+* gtk/README in Basalt for why, and how a host places it.
+* Colors are the shared base16 rice palette; accent is the neutral base03.
+* stylelint-disable at-rule-no-unknown
+*/
+
+@define-color accent_color #6e7371;
+@define-color accent_bg_color #6e7371;
+@define-color accent_fg_color #f2f4f3;
+
+@define-color destructive_bg_color #ff615d;
+@define-color destructive_fg_color #f2f4f3;
+
+@define-color error_bg_color #ff615d;
+@define-color error_fg_color #f2f4f3;
+
+@define-color window_bg_color #141817;
+@define-color window_fg_color #f2f4f3;
+
+@define-color view_bg_color #141817;
+@define-color view_fg_color #f2f4f3;
+
+@define-color headerbar_bg_color #222725;
+@define-color headerbar_fg_color #f2f4f3;
+@define-color headerbar_backdrop_color @window_bg_color;
+
+@define-color popover_bg_color #222725;
+@define-color popover_fg_color #f2f4f3;
+
+@define-color card_bg_color #222725;
+@define-color card_fg_color #f2f4f3;
+
+@define-color dialog_bg_color #141817;
+@define-color dialog_fg_color #f2f4f3;
+
+@define-color overview_bg_color #222725;
+@define-color overview_fg_color #f2f4f3;
+
+@define-color sidebar_bg_color #222725;
+@define-color sidebar_fg_color #f2f4f3;
+@define-color sidebar_backdrop_color @window_bg_color;
+@define-color sidebar_border_color @window_bg_color;
+
+@define-color secondary_sidebar_bg_color #141817;
+@define-color secondary_sidebar_fg_color #f2f4f3;
+
+@define-color success_bg_color #123a1c;
+@define-color success_color #39ba5a;
+
+@define-color warning_bg_color #3a2f04;
+@define-color warning_color #bd9903;
+
+@define-color error_color #ff615d;
+
+/* Fullscreen media chrome; adw-gtk3 defaults these to flat black/white. */
+@define-color panel_bg_color #141817;
+@define-color panel_fg_color #f2f4f3;
+
+/* Defined by adw-gtk3 but not currently referenced by it — pinned so a
+   future version cannot reintroduce its #39393d. */
+@define-color thumbnail_bg_color #222725;

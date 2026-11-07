@@ -1,10 +1,11 @@
 # Basalt
 
 A Hyprland desktop: the compositor config, a quickshell shell (bar, launcher,
-power menu, emoji picker, settings and updates windows), and the hypr* tools
-and notifications styled to match. One base16 palette and one design system
-across all of it: dark, monochrome chrome, near-square corners, colour only
-where something means something.
+power menu, emoji picker, settings and updates windows), the hypr* tools and
+notifications, and the terminal around them (kitty, zsh, starship, yazi, btop,
+fastfetch, qalc), with GTK, Qt, the fonts and the cursor themed to match. One
+base16 palette and one design system across all of it: dark, monochrome
+chrome, near-square corners, colour only where something means something.
 
 Basalt is the shared part of a desktop that runs on more than one machine. A
 machine (a *host*) keeps only what is actually its own: its monitors, its
@@ -32,9 +33,17 @@ quickshell/      the shell, imported as qs.basalt
   HostConfig.qml   everything a host can set, with its default
   bar/ overlays/ settings/ shared/ theme/ updates/ data/
 dunst/dunstrc    notifications
-bin/             basalt-screenshot, basalt-dpms
-theme.json       the palette and fonts: the canonical copy
-nix/             the Nix builders and checks
+kitty/           the terminal
+zsh/             init.zsh and finish.zsh, sourced around a host's own rc
+starship/        the prompt
+yazi/            the file manager, and its `g m` plugin
+btop/ fastfetch/ qalculate/   the monitor, the banner, the calculator (and the launcher's maths)
+gtk/ qt/         the palette for GTK (adw-gtk3) and Qt (qt6ct); gtk/README.md says why
+fontconfig/      the default faces
+applications/    yazi-open.desktop, for folders opened from other programs
+bin/             basalt-screenshot, basalt-dpms, basalt-gsettings
+theme.json       the palette, fonts, icons, cursor and GTK theme: the canonical copy
+nix/             the NixOS module, the builders and the checks
 examples/        a host's side of everything, minimal
 ```
 
@@ -51,7 +60,13 @@ host's own file says what is not, then includes Basalt's.
 | hypridle | `~/.config/hypr/hypridle.conf` | `source = ./basalt/hypridle.conf` |
 | hyprpaper | `~/.config/hypr/hyprpaper.conf` | `$wallpaper = …`, then `source = ./basalt/hyprpaper.conf` |
 | dunst | `~/.config/dunst/dunstrc.d/*.conf` | `~/.config/dunst/dunstrc` *is* Basalt's |
-| scripts | — | `basalt-screenshot` and `basalt-dpms` on `PATH` |
+| kitty | `~/.config/kitty/kitty.d/*.conf` | `~/.config/kitty/kitty.conf` *is* Basalt's |
+| zsh | `~/.zshrc` | `source …/zsh/init.zsh`, the host's lines, `source …/zsh/finish.zsh` |
+| starship, yazi, btop, fastfetch, qalc | — | `~/.config/starship.toml`, `~/.config/yazi/`, `~/.config/btop/btop.conf`, `~/.config/fastfetch/config.jsonc`, `~/.config/qalculate/qalc.cfg` *are* Basalt's |
+| GTK | — | `gtk-{3,4}.0/{gtk,colors}.css` linked into `~/.config`, and `basalt-gsettings` run once |
+| Qt | — | `qt/qt6ct.conf` rendered into `~/.config/qt6ct/` with `@COLORS@` → `qt/base16.conf`, and `QT_QPA_PLATFORMTHEME=qt6ct` |
+| fonts | — | `fontconfig/50-basalt.conf` in `~/.config/fontconfig/conf.d/` |
+| scripts | — | `basalt-screenshot`, `basalt-dpms` (and `basalt-gsettings`) on `PATH` |
 
 `examples/` has each of the host's files.
 
@@ -74,16 +89,65 @@ then copy the host's files from `examples/` and make them yours. Edits to
 Basalt's files are edits to the clone; the host's files are yours.
 
 What has to be installed: Hyprland 0.55 or later (the Lua config), quickshell
-0.2 or later (`qs.` imports), hypridle, hyprlock, hyprpaper and dunst, and what
-the shell and scripts call: grim, slurp, satty, jq, wl-clipboard, wtype,
-playerctl, brightnessctl, qalc, hyprshutdown, hyprpwcenter, nmcli and
-bluetoothctl. The fonts are Onest and Hack Nerd Font.
+0.2 or later (`qs.` imports), hypridle, hyprlock, hyprpaper and dunst, kitty,
+zsh with oh-my-zsh, zsh-autosuggestions and zsh-syntax-highlighting, starship,
+yazi, btop, fastfetch, qalc, nautilus, and what the shell and scripts call:
+grim, slurp, satty, jq, wl-clipboard, wtype, playerctl, brightnessctl,
+hyprshutdown, hyprpwcenter, nmcli and bluetoothctl. Themes: adw-gtk3, Papirus,
+Bibata, qt6ct. Fonts: Onest, Hack Nerd Font, Noto.
 
-### From Nix
+### From NixOS: the module
 
-The flake's `lib` builds each piece in the store from a host's settings, so
-nothing under `~/.config` is involved. It wraps and installs nothing: hand the
-results to whatever the host already uses to start Hyprland and the rest.
+One module is the whole of it:
+
+```nix
+{
+  imports = [ inputs.basalt.nixosModules.default ];
+
+  basalt = {
+    enable = true;
+    display.outputs = [
+      { name = "DP-1"; mode = "2560x1440@60"; position = "1920x0"; }
+      { name = "HDMI-A-1"; mode = "1920x1080@60"; position = "0x100"; }
+    ];
+    updates = {
+      status = [ "snout" "has-updates" "--json" ];
+      details = [ "snout" "report" "--json" ];
+    };
+    shell.settings.launchCommand = [ "uwsm" "app" "--" "{id}.desktop" ];
+    idle.action = "blank-when-locked";
+  };
+}
+```
+
+Every program is wrapped so its config comes from the store, recoloured into
+`basalt.theme`, and nothing under `~/.config` is read, except GTK's and Qt's
+few files, which nothing else can deliver: those are linked into `$HOME` by
+systemd user tmpfiles on every switch. Hyprland starts through UWSM by default.
+
+| Option | Default | What it does |
+|---|---|---|
+| `basalt.enable` | `false` | Everything below. |
+| `.theme.{palette,fonts,cursor}` | Basalt's `theme.json` | The look, everywhere. |
+| `.display.outputs` | `null` | Declared monitors, in layout order; null derives them from what is connected. |
+| `.autostart` | hyprpaper, hypridle, dunst, hyprpolkitagent | What starts with the session, before the shell. |
+| `.hyprland.{settings,extraConfig,withUWSM}` | | More `setup()` options; Lua of the host's own after it. |
+| `.shell.{settings,host,extraFiles}` | | `Host.qml` properties, or a `Host.qml` of the host's own. |
+| `.updates.{status,details,check}` | `[ ]` | The updates commands (see the protocol below). |
+| `.idle.{action,timeout}` | `lock`, `300` | Lock after idling, blank only once locked (`blank-when-locked`), or `none`. |
+| `.lock.extraConfig` | the wallpaper, frosted | hyprlock's background and auth block. |
+| `.wallpaper.{width,height}` | the largest declared mode | The size the wallpaper is rendered at. |
+| `.notifications.extraConfig`, `.kitty.extraConfig`, `.zsh.extraConfig` | | The host's own additions to each. |
+| `.<piece>.enable` | `true` | Turn one piece off: `shellUi`, `lock`, `idle`, `wallpaper`, `notifications`, `kitty`, `starship`, `zsh`, `yazi`, `nautilus`, `gtk`, `qt`, `fonts`, `cursor`, `btop`, `fastfetch`, `qalculate`. |
+| `.build` | read-only | The Hyprland and quickshell config directories and the wallpaper, for a host's own checks and its login screen. |
+
+The login screen, the user's login shell and default applications (which
+browser, whether folders open in yazi) stay the host's.
+
+### From Nix, piece by piece
+
+The flake's `lib` is what the module is built from: each builder makes one
+piece in the store from a host's settings, and wraps and installs nothing.
 
 ```nix
 { inputs, pkgs, ... }:
@@ -167,12 +231,14 @@ ordering rule.
 
 ### The palette
 
-`theme.json` is the canonical palette and font set. It is repeated in each
-config's own syntax (`palette.lua`, `palette.conf`, `HostConfig.qml`,
-`dunstrc`), and `nix flake check` fails if any of them stops agreeing. A host
-with a palette of its own passes it to `setup()` and `Host.qml`, sources its
-own `palette.conf` in `hyprlock.conf`, and (from Nix) gets a recoloured
-`dunstrc` and wallpaper.
+`theme.json` is the canonical palette, fonts, icons, cursor and GTK theme. It
+is repeated in each config's own syntax (`palette.lua`, `palette.conf`,
+`HostConfig.qml`, and written out literally in dunst's, kitty's, starship's,
+yazi's, GTK's and Qt's files, fontconfig and `basalt-gsettings`), and
+`nix flake check` fails if any of them stops agreeing. With the NixOS module,
+`basalt.theme` recolours all of it. A plain-files host with a palette of its
+own passes it to `setup()` and `Host.qml` and sources its own `palette.conf`;
+the literal files it would have to copy.
 
 ## The updates protocol
 
@@ -252,11 +318,12 @@ nix flake check
 nix fmt
 ```
 
-The checks build the example host through the same builders a host uses:
-`Hyprland --verify-config` on a derived and a declared layout, qmllint over
-the shell (with the example's `Host.qml` and with a generated one), the
-palette copies against `theme.json`, the scripts (shellcheck), the wallpaper,
-and every generated `.conf`.
+The checks build a whole NixOS system with the module (every piece on), and
+the example host through the same builders: `Hyprland --verify-config` on a
+derived and a declared layout and on the module's, qmllint over the shell (the
+example's `Host.qml`, a generated one, the module's), the palette copies
+against `theme.json`, the scripts (shellcheck), the wallpaper, and every
+generated `.conf`.
 
 To try a change on a running session, point quickshell at a directory holding
 a host's `shell.qml` and `Host.qml` and a `basalt` link to your checkout:

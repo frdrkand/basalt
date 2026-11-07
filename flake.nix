@@ -16,6 +16,9 @@
       # The builders a Nix host uses; see nix/lib.nix.
       lib = import ./nix/lib.nix { inherit (nixpkgs) lib; };
 
+      # The whole desktop as one NixOS module; see nix/module.nix.
+      nixosModules.default = import ./nix/module.nix self.lib;
+
       packages = forAll (pkgs: rec {
         scripts = self.lib.scripts { inherit pkgs; };
         wallpaper = self.lib.wallpaper { inherit pkgs; };
@@ -25,8 +28,9 @@
       checks = forAll (
         pkgs:
         import ./nix/checks.nix {
-          inherit pkgs;
+          inherit pkgs nixpkgs;
           basalt = self.lib;
+          module = self.nixosModules.default;
         }
       );
 
