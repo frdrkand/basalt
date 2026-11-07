@@ -1,0 +1,18 @@
+# Basalt's default applications in a Hyprland session.
+#
+# A folder another program asks to open (a browser's "show in folder", a
+# download's "open containing folder", a mounted drive) opens in nautilus.
+# yazi stays SUPER+E, and stays one choice away in "Open with": yazi-open.desktop
+# (yazi in kitty) declares folders itself, so needs nothing here. A
+# desktop-specific list may only set defaults; GLib refuses added or removed
+# associations in one.
+#
+# Desktop-specific: XDG_CURRENT_DESKTOP=Hyprland makes GLib and xdg-utils read
+# hyprland-mimeapps.list before mimeapps.list in the same directory, so this
+# wins over the generic list beside it and applies to no other session.
+# basalt-link links it as ~/.config/hyprland-mimeapps.list; the NixOS module
+# installs it as /etc/xdg/hyprland-mimeapps.list, which a user's own
+# ~/.config/mimeapps.list still overrides.
+
+[Default Applications]
+inode/directory=org.gnome.Nautilus.desktop

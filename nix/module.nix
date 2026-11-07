@@ -312,7 +312,7 @@ in
       };
     };
     yazi = piece "the file manager (yazi)";
-    nautilus = piece "nautilus, with gvfs and file-roller";
+    nautilus = piece "nautilus, with gvfs and file-roller, as the folder browser other programs open";
     gtk = piece "GTK theming (adw-gtk3, the palette, icons, fonts)";
     qt = piece "Qt theming (qt6ct)";
     fonts = piece "the fonts and fontconfig defaults";
@@ -561,7 +561,8 @@ in
             "${themedDir ../yazi "basalt-yazi-config"}"
           ];
         })
-        # inode/directory -> yazi in kitty; the host makes it the default.
+        # yazi in kitty for a folder, as an "Open with" choice; nautilus is the
+        # default (the nautilus piece).
         (runCommand "yazi-open" { } ''
           install -Dm644 ${../applications/yazi-open.desktop} $out/share/applications/yazi-open.desktop
         '')
@@ -574,8 +575,12 @@ in
     })
 
     (mkIf cfg.nautilus.enable {
-      # For removable and network drives, phones and archives: folders still
-      # open in yazi unless the host's mime defaults say otherwise.
+      # The folder browser other programs open, and the way to removable and
+      # network drives, phones and archives. yazi stays SUPER+E. The default
+      # is desktop-specific (applications/hyprland-mimeapps.list), so it
+      # outranks the host's /etc/xdg/mimeapps.list in a Hyprland session; a
+      # user's own ~/.config/mimeapps.list still wins.
+      environment.etc."xdg/hyprland-mimeapps.list".source = ../applications/hyprland-mimeapps.list;
       services.gvfs.enable = true;
       environment.systemPackages = with pkgs; [
         nautilus

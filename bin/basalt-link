@@ -41,6 +41,7 @@ links=(
   "$config/gtk-4.0/colors.css=gtk/gtk-4.0/colors.css"
   "$config/fontconfig/conf.d/50-basalt.conf=fontconfig/50-basalt.conf"
   "$data/applications/yazi-open.desktop=applications/yazi-open.desktop"
+  "$config/hyprland-mimeapps.list=applications/hyprland-mimeapps.list"
   "$bin/basalt-screenshot=bin/basalt-screenshot"
   "$bin/basalt-dpms=bin/basalt-dpms"
   "$bin/basalt-gsettings=bin/basalt-gsettings"

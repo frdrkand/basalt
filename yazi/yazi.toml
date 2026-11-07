@@ -1,5 +1,6 @@
-# Basalt's file manager: yazi, in kitty. SUPER+E, and folders opened from other
-# programs (applications/yazi-open.desktop).
+# Basalt's file manager: yazi, in kitty, on SUPER+E. Folders other programs open
+# go to nautilus (applications/hyprland-mimeapps.list); yazi-open.desktop keeps
+# yazi one choice away in "Open with".
 #
 # USING IT. yazi reads this directory as ~/.config/yazi, or $YAZI_CONFIG_HOME:
 # link it as the former. From Nix, the module wraps yazi with YAZI_CONFIG_HOME

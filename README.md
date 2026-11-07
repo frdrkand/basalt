@@ -40,7 +40,7 @@ yazi/            the file manager, and its `g m` plugin
 btop/ fastfetch/ qalculate/   the monitor, the banner, the calculator (and the launcher's maths)
 gtk/ qt/         the palette for GTK (adw-gtk3) and Qt (qt6ct); gtk/README.md says why
 fontconfig/      the default faces
-applications/    yazi-open.desktop, for folders opened from other programs
+applications/    folders from other programs open in nautilus (hyprland-mimeapps.list); yazi-open.desktop for "Open with"
 bin/             basalt-link, basalt-gsettings, basalt-screenshot, basalt-dpms
 theme.json       the palette, fonts, icons, cursor and GTK theme: the canonical copy
 nix/             the NixOS module, the builders and the checks
@@ -144,7 +144,9 @@ systemd user tmpfiles on every switch. Hyprland starts through UWSM by default.
 | `.build` | read-only | The Hyprland and quickshell config directories and the wallpaper, for a host's own checks and its login screen. |
 
 The login screen, the user's login shell and default applications (which
-browser, whether folders open in yazi) stay the host's.
+browser, mail) stay the host's. Folders that other programs open go to
+nautilus in a Hyprland session (`applications/hyprland-mimeapps.list`);
+SUPER+E is yazi.
 
 ### From Nix, piece by piece
 
