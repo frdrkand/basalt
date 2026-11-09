@@ -43,6 +43,12 @@ if [[ -r $BASALT_OMZ/oh-my-zsh.sh ]]; then
   source "$ZSH/oh-my-zsh.sh"
 fi
 
+# ---- pager ----
+# less quits by itself when the output fits on one screen, so a short `git diff`
+# just prints. Git asks for this (LESS=FRX) only when LESS is unset, and
+# oh-my-zsh sets it to -R, so it is set here, after oh-my-zsh.
+export LESS=-FR
+
 # ---- aliases ----
 alias l='ls -alh'
 alias ll='ls -l'
