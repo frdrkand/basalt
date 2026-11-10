@@ -176,8 +176,11 @@ Scope {
           // ---- what checking is doing: notices, progress, failures ----
           Rectangle {
             Layout.fillWidth: true
+            // Coerced: with no `about`, the chain ends in undefined, and assigning
+            // undefined to `visible` resets it to its default — true — leaving
+            // an empty panel above the list.
             visible: root.notices.length > 0 || root.working || root.errorLine.length > 0
-                     || (root.d && root.d.about)
+                     || !!(root.d && root.d.about)
             implicitHeight: panel.implicitHeight + Theme.space5 * 2
             radius: Theme.radiusLg
             color: Theme.bgSurface

@@ -22,6 +22,26 @@ Rectangle {
     return n;
   }
 
+  // BlueZ reports battery as 0–1; normalise in case a backend hands over 0–100.
+  function batteryPct(d) {
+    return d.battery <= 1 ? Math.round(d.battery * 100) : Math.round(d.battery);
+  }
+  function batteryColor(pct, fallback) {
+    return pct <= 5 ? Theme.accentDanger : pct <= 10 ? Theme.accentWarning : fallback;
+  }
+
+  // Lowest battery among connected devices that report one; -1 when none do.
+  readonly property int lowestBattery: {
+    var low = -1;
+    for (var i = 0; i < devices.length; i++) {
+      var d = devices[i];
+      if (!d.connected || !d.batteryAvailable) continue;
+      var p = batteryPct(d);
+      if (low < 0 || p < low) low = p;
+    }
+    return low;
+  }
+
   visible: adapter !== null
   Layout.alignment: Qt.AlignVCenter
   implicitHeight: Theme.barHeight - 8
@@ -37,7 +57,9 @@ Rectangle {
     text: "\uf293"   // nf-fa-bluetooth
     font.family: Theme.fontGlyph
     font.pixelSize: Theme.textBody
-    color: root.enabled ? Theme.fgSecondary : Theme.fgMuted
+    color: !root.enabled ? Theme.fgMuted
+         : root.lowestBattery >= 0 ? root.batteryColor(root.lowestBattery, Theme.fgSecondary)
+         : Theme.fgSecondary
   }
 
   HoverHandler { id: hover }
@@ -100,9 +122,8 @@ Rectangle {
           }
           Text {
             visible: devRow.modelData.batteryAvailable
-            text: (devRow.modelData.battery <= 1 ? Math.round(devRow.modelData.battery * 100)
-                                                  : Math.round(devRow.modelData.battery)) + "%"
-            color: Theme.fgMuted
+            text: root.batteryPct(devRow.modelData) + "%"
+            color: root.batteryColor(root.batteryPct(devRow.modelData), Theme.fgMuted)
             font.family: Theme.fontFamily
             font.pixelSize: Theme.textMicro
           }
