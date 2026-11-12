@@ -35,6 +35,7 @@ links=(
   "$config/btop/btop.conf=btop/btop.conf"
   "$config/fastfetch/config.jsonc=fastfetch/config.jsonc"
   "$config/qalculate/qalc.cfg=qalculate/qalc.cfg"
+  "$config/omarchy/current/theme/colors.toml=disktree/colors.toml"
   "$config/gtk-3.0/gtk.css=gtk/gtk-3.0/gtk.css"
   "$config/gtk-3.0/colors.css=gtk/gtk-3.0/colors.css"
   "$config/gtk-4.0/gtk.css=gtk/gtk-4.0/gtk.css"

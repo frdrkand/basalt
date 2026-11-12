@@ -2,10 +2,11 @@
 
 A Hyprland desktop: the compositor config, a quickshell shell (bar, launcher,
 power menu, emoji picker, settings and updates windows), the hypr* tools and
-notifications, and the terminal around them (kitty, zsh, starship, yazi, btop,
-fastfetch, qalc), with GTK, Qt, the fonts and the cursor themed to match. One
-base16 palette and one design system across all of it: dark, monochrome
-chrome, near-square corners, colour only where something means something.
+notifications, the terminal around them (kitty, zsh, starship, yazi, btop,
+fastfetch, qalc) and disktree, with GTK, Qt, the fonts and the cursor themed to
+match. One base16 palette and one design system across all of it: dark,
+monochrome chrome, near-square corners, colour only where something means
+something.
 
 Basalt is the shared part of a desktop that runs on more than one machine. A
 machine (a *host*) keeps only what is actually its own: its monitors, its
@@ -38,6 +39,7 @@ zsh/             init.zsh and finish.zsh, sourced around a host's own rc
 starship/        the prompt
 yazi/            the file manager, and its `g m` plugin
 btop/ fastfetch/ qalculate/   the monitor, the banner, the calculator (and the launcher's maths)
+disktree/        the disk usage treemap's colours (an Omarchy colors.toml)
 gtk/ qt/         the palette for GTK (adw-gtk3) and Qt (qt6ct); gtk/README.md says why
 fontconfig/      the default faces
 applications/    folders from other programs open in nautilus (hyprland-mimeapps.list); yazi-open.desktop for "Open with"
@@ -63,6 +65,7 @@ host's own file says what is not, then includes Basalt's.
 | kitty | `~/.config/kitty/kitty.d/*.conf` | `~/.config/kitty/kitty.conf` *is* Basalt's |
 | zsh | `~/.zshrc` | `source …/zsh/init.zsh`, the host's lines, `source …/zsh/finish.zsh` |
 | starship, yazi, btop, fastfetch, qalc | — | `~/.config/starship.toml`, `~/.config/yazi/`, `~/.config/btop/btop.conf`, `~/.config/fastfetch/config.jsonc`, `~/.config/qalculate/qalc.cfg` *are* Basalt's |
+| disktree | — | `~/.config/omarchy/current/theme/colors.toml` *is* Basalt's |
 | GTK | — | `gtk-{3,4}.0/{gtk,colors}.css` linked into `~/.config`, and `basalt-gsettings` run once |
 | Qt | — | `qt/qt6ct.conf` rendered into `~/.config/qt6ct/` with `@COLORS@` → `qt/base16.conf`, and `QT_QPA_PLATFORMTHEME=qt6ct` |
 | fonts | — | `fontconfig/50-basalt.conf` in `~/.config/fontconfig/conf.d/` |
@@ -93,7 +96,7 @@ session.
 What has to be installed: Hyprland 0.55 or later (the Lua config), quickshell
 0.2 or later (`qs.` imports), hypridle, hyprlock, hyprpaper and dunst, kitty,
 zsh with oh-my-zsh, zsh-autosuggestions and zsh-syntax-highlighting, starship,
-yazi, btop, fastfetch, qalc, nautilus, and what the shell and scripts call:
+yazi, btop, fastfetch, qalc, nautilus, disktree, and what the shell and scripts call:
 grim, slurp, satty, jq, wl-clipboard, wtype, playerctl, brightnessctl,
 hyprshutdown, hyprpwcenter, nmcli and bluetoothctl. Themes: adw-gtk3, Papirus,
 Bibata, qt6ct. Fonts: Onest, Hack Nerd Font, Noto.
@@ -140,7 +143,7 @@ systemd user tmpfiles on every switch. Hyprland starts through UWSM by default.
 | `.lock.extraConfig` | the wallpaper, frosted | hyprlock's background and auth block. |
 | `.wallpaper.{width,height}` | the largest declared mode | The size the wallpaper is rendered at. |
 | `.notifications.extraConfig`, `.kitty.extraConfig`, `.zsh.extraConfig` | | The host's own additions to each. |
-| `.<piece>.enable` | `true` | Turn one piece off: `shellUi`, `lock`, `idle`, `wallpaper`, `notifications`, `kitty`, `starship`, `zsh`, `yazi`, `nautilus`, `gtk`, `qt`, `fonts`, `cursor`, `btop`, `fastfetch`, `qalculate`. |
+| `.<piece>.enable` | `true` | Turn one piece off: `shellUi`, `lock`, `idle`, `wallpaper`, `notifications`, `kitty`, `starship`, `zsh`, `yazi`, `nautilus`, `gtk`, `qt`, `fonts`, `cursor`, `btop`, `fastfetch`, `qalculate`, `disktree`. |
 | `.build` | read-only | The Hyprland and quickshell config directories and the wallpaper, for a host's own checks and its login screen. |
 
 The login screen, the user's login shell and default applications (which
@@ -238,8 +241,8 @@ ordering rule.
 `theme.json` is the canonical palette, fonts, icons, cursor and GTK theme. It
 is repeated in each config's own syntax (`palette.lua`, `palette.conf`,
 `HostConfig.qml`, and written out literally in dunst's, kitty's, starship's,
-yazi's, GTK's and Qt's files, fontconfig and `basalt-gsettings`), and
-`nix flake check` fails if any of them stops agreeing. With the NixOS module,
+yazi's, GTK's, Qt's and disktree's files, fontconfig and `basalt-gsettings`),
+and `nix flake check` fails if any of them stops agreeing. With the NixOS module,
 `basalt.theme` recolours all of it. A plain-files host with a palette of its
 own passes it to `setup()` and `Host.qml` and sources its own `palette.conf`;
 the literal files it would have to copy.

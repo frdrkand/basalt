@@ -320,6 +320,7 @@ in
     btop = piece "btop";
     fastfetch = piece "fastfetch";
     qalculate = piece "qalc (also the launcher's maths)";
+    disktree = piece "disktree, the disk usage treemap";
 
     build = mkOption {
       type = types.attrs;
@@ -721,6 +722,16 @@ in
             ''}"
           ];
         })
+      ];
+    })
+
+    (mkIf cfg.disktree.enable {
+      # disktree takes its colours from an Omarchy theme file under $HOME
+      # (gpui-omarchy has no flag or variable for one), so the file is linked
+      # there. It reloads when the file changes. See disktree/colors.toml.
+      environment.systemPackages = [ pkgs.disktree ];
+      systemd.user.tmpfiles.rules = [
+        "L+ %h/.config/omarchy/current/theme/colors.toml - - - - ${themed ../disktree/colors.toml}"
       ];
     })
   ]);
