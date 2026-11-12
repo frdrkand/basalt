@@ -94,6 +94,7 @@ let
         ../gtk/gtk-3.0/colors.css
         ../gtk/gtk-4.0/colors.css
         ../qt/base16.conf
+        ../disktree/colors.toml
       ]
     }; do
       for hex in $(grep -oiE '#[0-9a-f]{6}' "$f" | tr A-F a-f | sort -u); do

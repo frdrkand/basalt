@@ -1,0 +1,22 @@
+# disktree's colours. disktree draws with gpui-omarchy, which reads an Omarchy
+# theme's colors.toml from ~/.local/state/omarchy/current/theme/, or else
+# ~/.config/omarchy/current/theme/ (where this is linked), and reloads it
+# when it changes. Without one it falls back to Tokyo Night.
+#
+# The roles follow quickshell's Theme.qml: monochrome chrome with base03 as
+# the accent (text on it comes out base07-white). The only hue is warning
+# yellow, which disktree uses for the selection, the main action and the
+# space a removal frees. The accent's hue also tints the age view.
+# gpui-omarchy derives the rest itself: the inset from these, square corners,
+# and the monospace face from fontconfig (Basalt's mono).
+
+mode = "dark"
+background = "#141817"
+lighter_background = "#222725"
+foreground = "#f2f4f3"
+accent = "#6e7371"
+selection = "#293b35"
+muted = "#6e7371"
+red = "#ff615d"
+yellow = "#bd9903"
+green = "#39ba5a"

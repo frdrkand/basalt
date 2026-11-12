@@ -47,6 +47,18 @@ hl.window_rule({
     center = true,
 })
 
+-- disktree floats at the size its README suggests: the treemap wants room, and
+-- below its 900x600 minimum it stops being readable, which a narrow column
+-- would push it under.
+hl.window_rule({
+    name  = "disktree",
+    match = { class = "^(disktree)$" },
+
+    float  = true,
+    size   = "1400 900",
+    center = true,
+})
+
 -- Frosted glass for dunst toasts, matching the design system's NotificationCard
 -- (--bg-glass-strong panel over a blurred backdrop). dunst renders on the
 -- "notifications" layer; ignore_alpha keeps the transparent rounded-corner
